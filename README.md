@@ -23,47 +23,40 @@ This thesis mathematically proves that while standard 2-Stage Hierarchies fail d
 
 ---
 
-## 🔬 The Core Methodology
+## 🔬 Visualizing the Methodology
 
-### 1. The Baseline Problem (Phase 2-C)
-Standard Flat Classifiers overfit the majority FR class. A flat `LinearSVC` with `TF-IDF` vectors achieves **90.35% global accuracy**, but close inspection of its class-wise metrics reveals it scores **0.00 Precision/Recall** on minority classes like Fault Tolerance and Scalability. 
+### 1. The Accuracy Paradox (Phase 2-C)
+Standard Flat Classifiers overfit the majority FR class. A flat `LinearSVC` achieves **90.35% global accuracy**, but close inspection of its class-wise metrics reveals it scores **0.00 Precision/Recall** on minority classes like Fault Tolerance. 
 
-### 2. The Cascading Error (Phase 4-Simple)
-To force the model to identify minority classes, a standard 2-Stage hierarchy is used (Stage 1 separates FR vs. NFR, Stage 2 classifies specific NFRs). However, any NFR falsely predicted as an FR in Stage 1 is permanently dropped. This "Cascading Drop" bleeds the architecture's accuracy down to **86.78%**.
+<p align="center">
+  <img src="Phase%201/images/plot_3_minority.png" alt="Accuracy Paradox" width="800">
+</p>
 
-### 3. The Solution: Adaptive Self-Correcting Hierarchy (Phase 4-New)
-Our proposed architecture introduces two novel mechanics to solve the hierarchy bleed:
-1. **The 5.0x Paranoid Multiplier:** A dynamic cost-sensitive penalty injected into the Optuna optimizer forcing Stage 1 to heavily penalize dropping NFRs.
-2. **The FR Catch-Bin:** Stage 2 is dynamically expanded to include a Catch-Bin. If Stage 1 is unsure, it pushes the requirement to Stage 2. If Stage 2 determines it was actually an FR, the Catch-Bin rescues it and corrects the prediction. 
+### 2. The Cascading Error & Catch-Bin Recovery
+To force the model to identify minority classes, a standard 2-Stage hierarchy is used. However, any NFR falsely predicted as an FR in Stage 1 is permanently dropped. This "Cascading Drop" bleeds the architecture's accuracy down to **86.78%**.
 
-**Result:** The Self-Correcting Hierarchy successfully restores accuracy back to **90.16%** while protecting the minority classes—achieving both Fairness and Accuracy.
+Our **Adaptive Self-Correcting Hierarchy** introduces a Catch-Bin. If Stage 2 determines a routed requirement was actually an FR, the Catch-Bin rescues it. **Result:** The Self-Correcting Hierarchy successfully restores accuracy back to **90.16%**!
+
+<p align="center">
+  <img src="Phase%201/images/plot_1_recovery.png" alt="Catch-Bin Recovery" width="600">
+</p>
+
+### 3. The Extreme Rescue Case (Word2Vec)
+In weaker embeddings like Word2Vec, the Cascading Drop is catastrophic (crashing to 57.39%). The Catch-Bin flawlessly rescues the architecture, restoring it to **85.37%**.
+
+<p align="center">
+  <img src="Phase%201/images/plot_2_extreme.png" alt="Extreme Rescue" width="600">
+</p>
 
 ---
 
 ## 📂 Repository Structure (Phase 1)
-
-All experimental data, tuning scripts, and mathematical proofs are organized under the `Phase 1` directory:
-
 | Directory | Description |
 | :--- | :--- |
-| 📁 **`Phase_2_Baselines/`** | Contains the baseline 1-Stage flat classifiers. Used to demonstrate the "Accuracy Paradox" and minority class starvation. |
-| 📁 **`Phase_4_Simple_Hierarchies/`** | Contains classical 2-Stage Hierarchies. Used to demonstrate the "Cascading Error" drop in global accuracy. |
-| 📁 **`Phase_4_NEW_Self_Correcting_Hierarchies/`** | **(The Proposed Architecture)** Contains the advanced codebase featuring the 5x Paranoid Penalty and the dynamic Stage-2 Catch-Bin. |
-| 📁 **`Analysis_and_Comparisons/`** | Contains scripts that extract detailed class-wise metrics (Precision/Recall) and merge all outputs into the Ultimate Thesis Tables. |
-
----
-
-## 📊 Key Findings
-
-The mathematical proof of the thesis, tested across 6 different text vectorization techniques (TF-IDF, Word2Vec, GloVe, BERT, SBERT, MPNet) and 6 classification algorithms on the FNFC Dataset.
-
-| Vectorization | Algorithm | Phase 2-C <br>(Biased Flat) | Phase 4-2C <br>(Cascading Drop) | Phase 4-2C-NEW <br>(Self-Correcting) |
-| :--- | :--- | :--- | :--- | :--- |
-| **TF-IDF** | **LinearSVC** | 90.35% | *86.78%* | **90.16%** |
-| **MPNet** | **XGBoost** | 89.09% | *88.47%* | **89.14%** |
-| **Word2Vec** | **LinearSVC** | 85.41% | *57.39%* | **85.37%** |
-
-*Notice the severe accuracy drop in the Simple Hierarchy (Phase 4-2C) and the near-perfect recovery by the Catch-Bin (Phase 4-2C-NEW).*
+| 📁 **`Phase_2_Baselines/`** | Baseline 1-Stage flat classifiers. |
+| 📁 **`Phase_4_Simple_Hierarchies/`** | Classical 2-Stage Hierarchies (Cascading Drop). |
+| 📁 **`Phase_4_NEW_Self_Correcting_Hierarchies/`** | **(The Proposed Architecture)** Advanced codebase featuring the 5x Paranoid Penalty and the dynamic Catch-Bin. |
+| 📁 **`Analysis_and_Comparisons/`** | Scripts for class-wise metrics and Ultimate Thesis Tables. |
 
 ---
 <div align="center">
