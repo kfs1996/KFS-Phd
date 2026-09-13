@@ -50,6 +50,33 @@ In weaker embeddings like Word2Vec, the Cascading Drop is catastrophic (crashing
 
 ---
 
+## 🧠 Explainable AI (XAI) Analysis
+
+To ensure absolute transparency and validate the mathematical hypotheses of this thesis, distinct Explainable AI (XAI) techniques were applied to each phase of the architecture to decode the "black box" routing logic.
+
+### Exposing the Baseline Bias (Phase 2)
+To prove the "Accuracy Paradox," we extracted the direct decision coefficients from the Phase 2 baseline model. The visual below demonstrates severe **vocabulary bias**: the model artificially inflates its 90% accuracy by blindly memorizing generic keywords (e.g., "system", "user") to predict the Functional class, which causes the starvation of complex minority classes.
+
+<p align="center">
+  <img src="Phase%201/images/XAI_Plots/Phase2_Vocabulary_Bias.png" alt="Vocabulary Bias" width="700">
+</p>
+
+### Decoding the Cascading Error (Phase 4-Simple)
+To mathematically prove *why* the Cascading Drop occurs, we hooked directly into XGBoost's native internal XAI engine in Stage 1. This visualization maps the exact lexical thresholds that dictate FR vs NFR routing, exposing the precise features that trigger false routes and permanent cascading drops.
+
+<p align="center">
+  <img src="Phase%201/images/XAI_Plots/Phase4_Stage1_XAI.png" alt="Stage 1 XAI" width="600">
+</p>
+
+### Proving the Catch-Bin Rescue (Phase 4-New)
+Using a counterfactual "What-If" visualization, we demonstrate the decision-boundary shift introduced by the Self-Correcting Catch-Bin. It visually proves how the architecture intercepts false positives dropping out of Stage 1 and miraculously flips the model's confidence back to the correct class in Stage 2.
+
+<p align="center">
+  <img src="Phase%201/images/XAI_Plots/Phase4_New_CatchBin_Rescue.png" alt="Catch-Bin Counterfactual" width="600">
+</p>
+
+---
+
 ## 📂 Repository Structure (Phase 1)
 | Directory | Description |
 | :--- | :--- |
